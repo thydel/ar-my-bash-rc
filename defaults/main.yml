@@ -1,2 +1,7 @@
+
 ---
-# defaults file for /home/thy/usr/thydel/ar-my-bashrc
+
+bashrc_template: default
+bashrc_file: bashrc
+#bashrc_dir: ansible_ssh_user
+

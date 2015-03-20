@@ -1,2 +1,11 @@
+
 ---
-# vars file for /home/thy/usr/thydel/ar-my-bashrc
+
+bashrc:
+  users:
+    example:
+      dir: my_dot_files
+      template: servers
+      file: my_bashrc
+    thy:
+

@@ -1,0 +1,71 @@
+#!/bin/bash
+
+shopt -s histappend
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PROMPT_COMMAND='history -a; echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"'
+    ;;
+#screen)
+#    PROMPT_COMMAND='history -a; st'
+#    ;;
+*)
+    PROMPT_COMMAND='history -a'
+    ;;
+esac
+
+THY=thy
+
+export HISTFILE=~/.bash_history.d/.bash_history-$(test -t 0 && basename $(tty))
+mkdir -p ~/.bash_history.d; chown $THY ~/.bash_history.d
+touch $HISTFILE; chown $THY $HISTFILE
+
+shopt -s histappend
+export HISTSIZE=50000
+export HISTCONTROL=ignoreboth
+export HISTTIMEFORMAT='%F+%T '
+
+sshs () { ssh -AXt -o StrictHostKeyChecking=no -o ServerAliveInterval=20 ${1:-nil} ${2:+-p $2} bash -l -i -c 'ssh_; exec screen -RdS thy'; }
+
+stw () { echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"; }
+sts () { echo -ne '\ek'"${USER}@$(hostname -s): ${PWD/$HOME/~}"'\e\\'; }
+st () { stw; sts; }
+stsl () { sudo -u thy screen -S ${1:-thy} -X title "${USER}@${HOSTNAME}: ${PWD/$HOME/~}"; }
+
+hfa () { cat ~/.bash_history ~/.bash_history.d/.bash_history-* | grep -i "$1"; }
+hf () { cat ~/.bash_history ~/.bash_history.d/.bash_history-* | grep -i "$1" | sort -u; }
+
+ssh_ () {
+	SSHVARS="SSH_CLIENT SSH_TTY SSH_AUTH_SOCK SSH_CONNECTION DISPLAY"
+
+	for x in ${SSHVARS} ; do
+	    (eval echo $x=\$$x) | sed  's/=/="/
+	                                s/$/"/
+	                                s/^/export /'
+	done 1> ~/.ssh_
+
+	for x in ${SSHVARS} ; do
+	    (eval echo $x=\$$x) | sed  's/=/" "/
+	                                s/$/")/
+	                                s/^/(setenv "/'
+	done 1> ~/.ssh.el
+}
+
+sshh () { source ~/.ssh_; ssh-add -l; }
+
+psr () { lsof -d rtd -a -t $1 | xargs ps -opid,uid,stat,lstart,cmd,tt; }
+
+gchange () { while read a; do test $a != "$b" && echo $a $b; b=$a; done; }
+newest () { find $* -type f | xargs stat -c '%z %n' | sort -nr; }
+
+curprev () { while read c; do echo $c ${p:-$c}; p=$c; done; }
+dif () { gawk '{print $1 - $2; fflush()}'; }
+ifree () { while true; do df -i $1 | tail -1 | awk '{print $4}'; sleep 1; done; }
+idif () { ifree $1 | curprev | dif; }
+skip () { gawk -v n=$1 '{if (n) --n; else print; fflush()}'; }
+mean () { gawk '{++n; s += $1; print $1, s / n; fflush()}'; }
+
+line2col () { awk 'BEGIN { FS = "\t" } NR == 1 { for (i = 1; i <= NF; ++i) t[i] = $i } NR > 1 { for (i = 1; i <= NF; ++i) print t[i] "\t" $i }'; }
+
+# if [ -f ~/.thy/.bashrc-thy ]; then . ~/.thy/.bashrc-thy; fi

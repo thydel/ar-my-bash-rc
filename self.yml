@@ -1,4 +1,23 @@
+# -*- Mode: YAML; indent-tabs-mode: nil; fill-column: 96; -*-
+#pipe cat > defaults/main.yml
+---
 
+bashrc_template: default
+bashrc_file: bashrc
+#bashrc_dir: ansible_ssh_user
+
+#pipe cat > vars/main.yml
+---
+
+bashrc:
+  users:
+    example:
+      dir: my_dot_files
+      template: servers
+      file: my_bashrc
+    thy:
+
+#pipe cat > tasks/main.yml
 ---
 
 - set_fact:
@@ -25,3 +44,4 @@
 
 - name: bash - edit .bashrc
   lineinfile: dest=~/.bashrc state=present insertafter=EOF line='{{ line }}'
+#pipe touch .stone
