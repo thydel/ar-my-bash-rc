@@ -31,9 +31,10 @@ sshs () { ssh -AXt -o StrictHostKeyChecking=no -o ServerAliveInterval=20 ${1:-ni
 stw () { echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"; }
 sts () { echo -ne '\ek'"${USER}@$(hostname -s): ${PWD/$HOME/~}"'\e\\'; }
 st () { stw; sts; }
+stsl () { sudo -u thy screen -S ${1:-thy} -X title "${USER}@${HOSTNAME}: ${PWD/$HOME/~}"; }
 
 hfa () { cat ~/.bash_history ~/.bash_history.d/.bash_history-* | grep -i "$1"; }
-hf () { hfa "$1" | sort -u; }
+hf () { cat ~/.bash_history ~/.bash_history.d/.bash_history-* | grep -i "$1" | sort -u; }
 
 ssh_ () {
 	SSHVARS="SSH_CLIENT SSH_TTY SSH_AUTH_SOCK SSH_CONNECTION DISPLAY"
@@ -52,3 +53,19 @@ ssh_ () {
 }
 
 sshh () { source ~/.ssh_; ssh-add -l; }
+
+psr () { lsof -d rtd -a -t $1 | xargs ps -opid,uid,stat,lstart,cmd,tt; }
+
+gchange () { while read a; do test $a != "$b" && echo $a $b; b=$a; done; }
+newest () { find $* -type f | xargs stat -c '%z %n' | sort -nr; }
+
+curprev () { while read c; do echo $c ${p:-$c}; p=$c; done; }
+dif () { gawk '{print $1 - $2; fflush()}'; }
+ifree () { while true; do df -i $1 | tail -1 | awk '{print $4}'; sleep 1; done; }
+idif () { ifree $1 | curprev | dif; }
+skip () { gawk -v n=$1 '{if (n) --n; else print; fflush()}'; }
+mean () { gawk '{++n; s += $1; print $1, s / n; fflush()}'; }
+
+line2col () { awk 'BEGIN { FS = "\t" } NR == 1 { for (i = 1; i <= NF; ++i) t[i] = $i } NR > 1 { for (i = 1; i <= NF; ++i) print t[i] "\t" $i }'; }
+
+# if [ -f ~/.thy/.bashrc-thy ]; then . ~/.thy/.bashrc-thy; fi

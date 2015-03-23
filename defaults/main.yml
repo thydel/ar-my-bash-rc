@@ -1,7 +1,7 @@
-
 ---
 
 bashrc_template: default
 bashrc_file: bashrc
-#bashrc_dir: ansible_ssh_user
+# dynamic default via task
+#bashrc_dir: ~/.{{ ansible_ssh_user }}
 

@@ -1,0 +1,77 @@
+# -*- Mode: YAML; indent-tabs-mode: nil; fill-column: 96; -*-
+#pipe cat > meta/main.yml
+---
+
+galaxy_info:
+  author: Thierry Delamare
+  description: Install my bashrc
+  company: EpiConcept
+  license: MIT
+  min_ansible_version: 1.8
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  - name: Debian
+    versions:
+    - wheezy
+  categories:
+  - system
+dependencies: []
+#pipe cat > bashrc-play.yml
+---
+
+- hosts: all
+
+  vars:
+    bashrc:
+      users:
+        example:            # user name
+          dir: my_dot_files # user dot files folder
+          template: servers # which template to use
+          file: my_bashrc   # which file to generate
+        thy:                # sane defaults apply
+
+  roles:
+    - .
+#pipe cat > defaults/main.yml
+---
+
+bashrc_template: default
+bashrc_file: bashrc
+# dynamic default via task
+#bashrc_dir: ~/.{{ ansible_ssh_user }}
+
+#pipe cat > tasks/main.yml
+---
+
+- assert:
+    that:
+      - ansible_ssh_user != 'root'
+      - bashrc.users[ansible_ssh_user] is defined
+
+- set_fact:
+    dir: ~/.{{ bashrc.users[ansible_ssh_user].dir | default(ansible_ssh_user) }}
+    file: |
+      {{ bashrc.users[ansible_ssh_user].file | default(bashrc_file) }}
+    template: |
+      {{ bashrc.users[ansible_ssh_user].template | default(bashrc_template) }}.j2
+
+- set_fact:
+    line: if [ -f {{ dir }}/{{ file }} ]; then . {{ dir }}/{{ file }}; fi
+
+- name: bash - our dot dir
+  file: path={{ dir }} state=directory
+
+- name: bash - allow check mode
+  file: path={{ dir }} state=directory
+  register: dirp
+
+- set_fact: { dir_created: "{{ not dirp.changed }}" }
+
+- name: bash - install template
+  template: src={{ template }} dest={{ dir }}/{{ file }}
+
+- name: bash - edit .bashrc
+  lineinfile: dest=~/.bashrc state=present insertafter=EOF line='{{ line }}'
+#pipe touch .stone

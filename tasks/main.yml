@@ -1,5 +1,9 @@
-
 ---
+
+- assert:
+    that:
+      - ansible_ssh_user != 'root'
+      - bashrc.users[ansible_ssh_user] is defined
 
 - set_fact:
     dir: ~/.{{ bashrc.users[ansible_ssh_user].dir | default(ansible_ssh_user) }}
