@@ -60,18 +60,12 @@ bashrc_file: bashrc
 - set_fact:
     line: if [ -f {{ dir }}/{{ file }} ]; then . {{ dir }}/{{ file }}; fi
 
-- name: bash - our dot dir
+- name: bashrc - our dot dir
   file: path={{ dir }} state=directory
 
-- name: bash - allow check mode
-  file: path={{ dir }} state=directory
-  register: dirp
-
-- set_fact: { dir_created: "{{ not dirp.changed }}" }
-
-- name: bash - install template
+- name: bashrc - install template
   template: src={{ template }} dest={{ dir }}/{{ file }}
 
-- name: bash - edit .bashrc
+- name: bashrc - edit .bashrc
   lineinfile: dest=~/.bashrc state=present insertafter=EOF line='{{ line }}'
 #pipe touch .stone
