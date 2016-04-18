@@ -26,6 +26,8 @@ export HISTSIZE=50000
 export HISTCONTROL=ignoreboth
 export HISTTIMEFORMAT='%F+%T '
 
+mscreen () { screen -c ~/.screenrc-$1 -RdS $1; }
+
 sshs () { ssh -AXt -o StrictHostKeyChecking=no -o ServerAliveInterval=20 ${1:-nil} ${2:+-p $2} bash -l -i -c 'ssh_; exec screen -RdS thy'; }
 
 stw () { echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"; }
