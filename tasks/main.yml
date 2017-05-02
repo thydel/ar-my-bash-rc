@@ -2,30 +2,30 @@
 
 - assert:
     that:
-      - ansible_ssh_user != 'root'
-      - bashrc.users[ansible_ssh_user] is defined
+      - ansible_user_id != 'root'
+      - bashrc.users[ansible_user_id] is defined
 
 - set_fact:
-    dir: ~/.{{ bashrc.users[ansible_ssh_user].dir | default(ansible_ssh_user) }}
-    file: |
-      {{ bashrc.users[ansible_ssh_user].file | default(bashrc_file) }}
-    template: |
-      {{ bashrc.users[ansible_ssh_user].template | default(bashrc_template) }}.j2
+    dir: ~/.{{ bashrc.users[ansible_user_id].dir | default(ansible_user_id) }}
+    file: '{{ bashrc.users[ansible_user_id].file | default(bashrc_file) }}'
+    template: '{{ bashrc.users[ansible_user_id].template | default(bashrc_template) }}.j2'
 
 - set_fact:
     line: if [ -f {{ dir }}/{{ file }} ]; then . {{ dir }}/{{ file }}; fi
 
-- name: bash - our dot dir
-  file: path={{ dir }} state=directory
+- name: our dot dir
+  file:
+    path: '{{ dir }}'
+    state: directory
 
-- name: bash - allow check mode
-  file: path={{ dir }} state=directory
-  register: dirp
+- name: install template
+  template:
+    src: '{{ template }}'
+    dest: '{{ dir }}/{{ file }}'
 
-- set_fact: { dir_created: "{{ not dirp.changed }}" }
-
-- name: bash - install template
-  template: src={{ template }} dest={{ dir }}/{{ file }}
-
-- name: bash - edit .bashrc
-  lineinfile: dest=~/.bashrc state=present insertafter=EOF line='{{ line }}'
+- name: edit .bashrc
+  lineinfile:
+    dest: ~/.bashrc
+    state: present
+    insertafter: EOF
+    line: '{{ line }}'
