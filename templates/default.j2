@@ -1,7 +1,5 @@
 #!/bin/bash
 
-shopt -s histappend
-
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
@@ -16,15 +14,33 @@ xterm*|rxvt*)
 esac
 
 THY=thy
+export HOST=$(hostname -s)
+export HISTDIR=~/.bash_history.d/$HOST
 
-export HISTFILE=~/.bash_history.d/.bash_history-$(test -t 0 && basename $(tty))
-mkdir -p ~/.bash_history.d; chown $THY ~/.bash_history.d
+export TTY=$(test -t 0 && basename $(tty) || echo no-tty)
+
+export HISTFILE=$HISTDIR/.bash_history-$TTY
+mkdir -p $HISTDIR; chown $THY $HISTDIR
 touch $HISTFILE; chown $THY $HISTFILE
 
 shopt -s histappend
+shopt -s cmdhist
 export HISTSIZE=50000
 export HISTCONTROL=ignoreboth
 export HISTTIMEFORMAT='%F+%T '
+
+export LOGDIR=~/.bash-logs.d/$HOST
+mkdir -p $LOGDIR
+log () {
+    h=$(history 1 | awk '{$1=_}1');
+    date=$(echo $h | awk '{print$1}' | tr -d '\n');
+    cmd=$(echo $h | awk '{$1=_}1' | cut -b 2-)
+    echo -e "(USER=\001$USER\001 cd \001$(pwd)\001;\001$cmd\001) #\001 $date";
+}
+export PROMPT_COMMAND+='; log >> $LOGDIR/$TTY-$(date "+%Y-%m-%d").log'
+
+hfa () { cat ~/.bash_history $(HISTDIR)/.bash_history-* | grep -i "$1"; }
+hf () { hfa "$1" | sort -u; }
 
 mscreen () { screen -c ~/.screenrc-$1 -RdS $1; }
 
@@ -33,9 +49,6 @@ sshs () { ssh -AXt -o StrictHostKeyChecking=no -o ServerAliveInterval=20 ${1:-ni
 stw () { echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"; }
 sts () { echo -ne '\ek'"${USER}@$(hostname -s): ${PWD/$HOME/~}"'\e\\'; }
 st () { stw; sts; }
-
-hfa () { cat ~/.bash_history ~/.bash_history.d/.bash_history-* | grep -i "$1"; }
-hf () { hfa "$1" | sort -u; }
 
 ssh_ () {
 	SSHVARS="SSH_CLIENT SSH_TTY SSH_AUTH_SOCK SSH_CONNECTION DISPLAY"

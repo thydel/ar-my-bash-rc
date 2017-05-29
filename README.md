@@ -7,6 +7,7 @@ make main
 ```
 
 ```bash
+bashrc-play.yml -i localhost, -c local -DC
 bashrc-play.yml -i $some_node, -DC
 bashrc-play.yml -i $some_node, -D
 ```
