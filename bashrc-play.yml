@@ -13,5 +13,4 @@
           file: my_bashrc   # which file to generate
         thy:                # sane defaults apply
 
-  roles:
-    - .
+  roles: [ self ]
