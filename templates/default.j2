@@ -47,8 +47,10 @@ hf () { hfa "$1" | sort -u; }
 hist-file() { echo history | env -i HISTFILE="$1" HISTTIMEFORMAT="%F+%T " bash --norc -i 2> /dev/null; }
 histhost() { if test "$1"; then echo $HISTDIR/../$1; else echo $HISTDIR; fi; }
 hh() { source <(find $(histhost $2) -type f | xargs grep -l "$1" | xargs -i echo "hist-file {} | grep '$1'") | sort -k2; }
+hhh() { hh "$1" $2 | c 4-; }
 
 h() { helper; }
+c() { tr -s ' ' | cut -d' ' -f$1; }
 
 mscreen () { screen -c ~/.screenrc-$1 -RdS $1; }
 
