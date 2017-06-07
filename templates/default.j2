@@ -25,8 +25,10 @@ touch $HISTFILE; chown $THY $HISTFILE
 
 shopt -s histappend
 shopt -s cmdhist
-export HISTSIZE=50000
-export HISTCONTROL=ignoreboth
+export HISTSIZE_=50000
+export HISTSIZE=$HISTSIZE_
+export HISTCONTROL_=ignoreboth
+export HISTCONTROL=$HISTCONTROL_
 export HISTTIMEFORMAT='%F+%T '
 export HISTIGNORE_='history:st:hg st:htop:clear:df -h:mount:env:xterm:pwd:sshh:date'
 export HISTIGNORE="$HISTIGNORE_"
@@ -46,9 +48,9 @@ export PROMPT_COMMAND+='; hlog >> $LOGFILE'
 hfa () { cat ~/.bash_history $HISTDIR/.bash_history-* | grep -i "$1"; }
 hf () { hfa "$1" | sort -u; }
 
-hist-file() { echo history | env -i HISTFILE="$1" HISTTIMEFORMAT="%F+%T " HISTIGNORE="$HISTIGNORE_" bash --norc -i 2> /dev/null; }
+hist-file() { echo history | env -i HISTFILE="$1" HISTSIZE=$HISTSIZE_ HISTCONTROL=$HISTCONTROL_ HISTIGNORE="$HISTIGNORE_" HISTTIMEFORMAT="%F+%T " bash --norc -i 2> /dev/null; }
 histhost() { if test "$1"; then echo $HISTDIR/../$1; else echo $HISTDIR; fi; }
-hh() { source <(find $(histhost $2) -type f | xargs grep -l "$1" | xargs -i echo "hist-file {} | grep '$1'") | sort -k2; }
+hh() { source <(find $(histhost $2) -maxdepth 1 -type f | xargs grep -l "$1" | xargs -i echo "hist-file {} | grep '$1'") | sort -k2; }
 hhh() { hh "$1" $2 | c 4-; }
 
 h() { helper; }
