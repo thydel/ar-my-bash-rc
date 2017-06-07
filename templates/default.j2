@@ -28,6 +28,7 @@ shopt -s cmdhist
 export HISTSIZE=50000
 export HISTCONTROL=ignoreboth
 export HISTTIMEFORMAT='%F+%T '
+export HISTIGNORE='history:st:hg st:htop:clear:df -h:mount:env:xterm:pwd:sshh:date'
 
 export LOGDIR=~/.bash-logs.d/$HOST
 export LOGFILE=$LOGDIR/.bash-log-$TTY
