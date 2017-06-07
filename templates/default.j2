@@ -28,7 +28,8 @@ shopt -s cmdhist
 export HISTSIZE=50000
 export HISTCONTROL=ignoreboth
 export HISTTIMEFORMAT='%F+%T '
-export HISTIGNORE='history:st:hg st:htop:clear:df -h:mount:env:xterm:pwd:sshh:date'
+export HISTIGNORE_='history:st:hg st:htop:clear:df -h:mount:env:xterm:pwd:sshh:date'
+export HISTIGNORE="$HISTIGNORE_"
 
 export LOGDIR=~/.bash-logs.d/$HOST
 export LOGFILE=$LOGDIR/.bash-log-$TTY
@@ -45,7 +46,7 @@ export PROMPT_COMMAND+='; hlog >> $LOGFILE'
 hfa () { cat ~/.bash_history $HISTDIR/.bash_history-* | grep -i "$1"; }
 hf () { hfa "$1" | sort -u; }
 
-hist-file() { echo history | env -i HISTFILE="$1" HISTTIMEFORMAT="%F+%T " bash --norc -i 2> /dev/null; }
+hist-file() { echo history | env -i HISTFILE="$1" HISTTIMEFORMAT="%F+%T " HISTIGNORE="$HISTIGNORE_" bash --norc -i 2> /dev/null; }
 histhost() { if test "$1"; then echo $HISTDIR/../$1; else echo $HISTDIR; fi; }
 hh() { source <(find $(histhost $2) -type f | xargs grep -l "$1" | xargs -i echo "hist-file {} | grep '$1'") | sort -k2; }
 hhh() { hh "$1" $2 | c 4-; }
