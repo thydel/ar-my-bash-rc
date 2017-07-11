@@ -13,6 +13,8 @@ xterm*|rxvt*)
     ;;
 esac
 
+export TMPDIR=/var/tmp
+
 THY=thy
 export HOST=$(hostname -s)
 export HISTDIR=~/.bash_history.d/$HOST
