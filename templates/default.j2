@@ -93,3 +93,7 @@ sts2 () { echo -ne '\ek'"$1"'\e\\'; }
 sshs2 () { sts2 $1; ssh -AXt -o StrictHostKeyChecking=no -o ServerAliveInterval=20 ${1:-nil} ${2:+-p $2} bash -l -i -c 'ssh_; exec screen -RdS thy'; }
 
 showswap () { find /proc -maxdepth 2 -mmin +1 -name status | xargs grep -l VmSwap | xargs grep -h -e Name -e Swap -e Tgid | cut -d: -f2 | paste - - - | column -t | sort -nr -k3 | grep -v ' 0 '; }
+
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+        source /etc/profile.d/vte-2.91.sh
+fi
