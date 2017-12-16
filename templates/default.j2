@@ -97,3 +97,5 @@ showswap () { find /proc -maxdepth 2 -mmin +1 -name status | xargs grep -l VmSwa
 if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
         source /etc/profile.d/vte-2.91.sh
 fi
+
+export SSH_AUTH_SOCK=/run/user/$(id -u thy)/user-ssh-agent.socket
