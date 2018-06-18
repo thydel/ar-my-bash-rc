@@ -66,6 +66,8 @@ stw () { echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"; }
 sts () { echo -ne '\ek'"${USER}@$(hostname -s): ${PWD/$HOME/~}"'\e\\'; }
 st () { stw; sts; }
 
+stsn () { echo -ne '\ek'"$1"'\e\\'; }
+
 ssh_ () {
 	SSHVARS="SSH_CLIENT SSH_TTY SSH_AUTH_SOCK SSH_CONNECTION DISPLAY"
 
