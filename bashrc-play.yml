@@ -12,5 +12,6 @@
           template: servers # which template to use
           file: my_bashrc   # which file to generate
         thy:                # sane defaults apply
+        thierrymdelamare:
 
   roles: [ self ]
