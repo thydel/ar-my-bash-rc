@@ -92,6 +92,8 @@ mx2x () { ssh -XC $1 x2x -west -to :0; }
 
 mscreen () { screen -c ~/.screenrc-$1 -RdS $1; }
 xscreen () { screen -c ~/.screenrc-$1 -x $1; }
+mscreen2 () { screen -c ~/.$USER/$1.screen -RdS $1; }
+xscreen2 () { screen -c ~/.$USER/$1.screen-$1 -x $1; }
 sts2 () { echo -ne '\ek'"$1"'\e\\'; }
 sshs2 () { sts2 $1; ssh -AXt -o StrictHostKeyChecking=no -o ServerAliveInterval=20 ${1:-nil} ${2:+-p $2} bash -l -i -c 'ssh_; exec screen -RdS thy'; }
 
