@@ -15,15 +15,15 @@ esac
 
 export TMPDIR=/var/tmp
 
-THY=thy
+[[ "$SUDO_USER" ]] && BASE_USER=$SUDO_USER || BASE_USER=$USER
 export HOST=$(hostname -s)
 export HISTDIR=~/.bash_history.d/$HOST
 
 export TTY=$(test -t 0 && basename $(tty) || echo no-tty)
 
 export HISTFILE=$HISTDIR/.bash_history-$TTY
-mkdir -p $HISTDIR; chown $THY $HISTDIR
-touch $HISTFILE; chown $THY $HISTFILE
+mkdir -p $HISTDIR; chown $BASE_USER $HISTDIR
+touch $HISTFILE; chown $BASE_USER $HISTFILE
 
 shopt -s histappend
 shopt -s cmdhist
@@ -37,8 +37,8 @@ export HISTIGNORE="$HISTIGNORE_"
 
 export LOGDIR=~/.bash-logs.d/$HOST
 export LOGFILE=$LOGDIR/.bash-log-$TTY
-mkdir -p $LOGDIR; chown $THY $LOGDIR
-touch $LOGFILE; chown $THY $LOGFILE
+mkdir -p $LOGDIR; chown $BASE_USER $LOGDIR
+touch $LOGFILE; chown $BASE_USER $LOGFILE
 hlog () {
     local h=$(history 1 | awk '{$1=_}1');
     local date=$(echo $h | awk '{print$1}' | tr -d '\n');
@@ -105,4 +105,6 @@ if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
         source /etc/profile.d/vte-2.91.sh
 fi
 
-export SSH_AUTH_SOCK=/run/user/$(id -u thy)/user-ssh-agent.socket
+if [[ $(lsb_release -sr) -lt 10 ]]; then
+    export SSH_AUTH_SOCK=/run/user/$(id -u $USER)/user-ssh-agent.socket
+fi
